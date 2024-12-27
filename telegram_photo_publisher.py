@@ -13,7 +13,8 @@ def publish_photos(bot, chat_id, folder_name, delay):
 
     while True:
         if not photos:
-            print('Нет доступных фото для публикации. Ожидание новых файлов...')
+            print('Нет доступных фото для публикации.'
+                  'Ожидание новых файлов...')
             time.sleep(delay)
             photos = get_all_files(folder_name)
             continue
@@ -26,7 +27,7 @@ def publish_photos(bot, chat_id, folder_name, delay):
                     bot.send_photo(chat_id=chat_id, photo=file)
                 published_photos.append(photo)
             except Exception as e:
-                print(f"Ошибка при публикации {photo}: {e}")
+                print(f'Ошибка при публикации {photo}: {e}')
 
             time.sleep(delay)
 
@@ -39,7 +40,9 @@ def main():
     env = Env()
     env.read_env()
 
-    parser = argparse.ArgumentParser(description='Скрипт для публикации фото в Telegram-канал.')
+    parser = argparse.ArgumentParser(
+        description='Скрипт для публикации фото в Telegram-канал.'
+    )
     parser.add_argument(
         '--chat_id',
         type=str,
@@ -63,7 +66,10 @@ def main():
     args = parser.parse_args()
 
     if not args.chat_id:
-        print("Не указан chat_id. Укажите его через --chat_id или переменную окружения TG_CHAT_ID.")
+        print(
+            'Не указан chat_id.'
+            'Укажите его через --chat_id или переменную окружения TG_CHAT_ID.'
+        )
         return
 
     token = env.str('TG_BOT_TOKEN')
