@@ -2,9 +2,11 @@ import argparse
 import os
 import requests
 
+from utils import create_folder
+
 
 def fetch_spacex_launch(launch_id, folder_name):
-    os.makedirs(folder_name, exist_ok=True)
+    create_folder(folder_name)
 
     try:
         url = f'https://api.spacexdata.com/v5/launches/{launch_id}'
