@@ -3,9 +3,11 @@ import os
 import requests
 from environs import Env
 
+from utils import create_folder
+
 
 def download_nasa_epic_images(api_key, folder_name, count=10):
-    os.makedirs(folder_name, exist_ok=True)
+    create_folder(folder_name)
     api_url = 'https://api.nasa.gov/EPIC/api/natural/images'
 
     try:
