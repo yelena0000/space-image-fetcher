@@ -7,7 +7,7 @@
 - Публикует фотографии в Telegram-канал с использованием Telegram-бота.
 - Поддерживает публикацию всех фотографий из указанной директории или одной случайной фотографии.
 
-### Как установить
+## Как установить
 
 Python3 должен быть уже установлен. 
 Затем используйте `pip` (или `pip3`, есть есть конфликт с Python2) для установки зависимостей:
@@ -22,102 +22,72 @@ pip install -r requirements.txt
 
 
 
-Для работы с Telegram-ботом создайте бота через [BotFather](https://core.telegram.org/bots#botfather) и получите токен. 
+Для работы с Telegram-ботом создайте бота через [BotFather](https://telegram.me/BotFather) и получите токен. 
 Укажите этот токен в переменной окружения `TG_BOT_TOKEN`. 
 Также укажите `TG_CHAT_ID`, который можно получить из Telegram (например, через `@userinfobot`).
 
 
-#### Перед запуском скриптов убедитесь, что:
+### Переменные окружения:
 
-У вас создан файл `.env`, в котором указаны следующие переменные окружения:
-```commandline
+Часть настроек проекта берётся из переменных окружения. Чтобы их определить, создайте файл `.env` рядом с `manage.py` и запишите туда данные в таком формате: `ПЕРЕМЕННАЯ=значение`:
+
+```
 NASA_API_KEY='your_nasa_api_key'
 TG_BOT_TOKEN='your_telegram_bot_token'
 TG_CHAT_ID='@example'
 DELAY=12345
 ```
 ***
-### Скрипты
-`download_nasa_apod_images.py`
+## Описание скриптов
+### download_nasa_apod_images.py
 
 Скрипт для скачивания изображений из **NASA APOD (Astronomy Picture of the Day)**.
 
-Пример использования:
-
 ```bash
-python download_nasa_apod_images.py --api_key <your_api_key> <folder_name> --count 30
+python download_nasa_apod_images.py --api_key <your_api_key> <folder_name> --count 12
 ```
-Аргументы:
 
-`--api_key`: ваш API ключ NASA.
-
-`<folder_name>`: папка, в которую будут сохранены изображения.
-
-`--count`: количество изображений для скачивания (по умолчанию 30).
+В приведённом выше примере: `<your_api_key>` - ваш API ключ NASA, `<folder_name>` - папка, в которую будут сохранены изображения, `12` - количество изображений для скачивания (по умолчанию 30).
 ***
-`download_nasa_epic_images.py`
+### download_nasa_epic_images.py
+
 Скрипт для скачивания изображений из **NASA EPIC (Earth Polychromatic Imaging Camera)**.
 
-Пример использования:
 
 ```bash
-python download_nasa_epic_images.py --api_key <your_api_key> <folder_name> --count 10
+python download_nasa_epic_images.py --api_key <your_api_key> <folder_name> --count 12
 ```
-Аргументы:
-
-`--api_key`: ваш API ключ NASA.
-
-`<folder_name>`: папка для сохранения изображений.
-
-`--count`: количество изображений (по умолчанию 10).
+В приведённом выше примере:  `<your_api_key>` - ваш API ключ NASA,  `<folder_name>` - папка для сохранения изображений, `12` - количество изображений (по умолчанию 10).
 ***
-`fetch_spacex_images.py`
+### fetch_spacex_images.py
 
 Скрипт для скачивания изображений с запуска **SpaceX**. 
 Поддерживает указание ID запуска или автоматическое скачивание изображений с последнего запуска.
 
-Пример использования:
 ```bash
 python fetch_spacex_images.py <folder_name> --launch_id <launch_id>
 ```
-Аргументы:
-
-`<folder_name>`: папка для сохранения фотографий.
-
-`--launch_id`: ID запуска SpaceX (если не указан, будет использован последний запуск).
+В приведённом выше примере:  `<folder_name>` - папка для сохранения фотографий, `<launch_id>` - ID запуска SpaceX (если не указан, будет использован последний запуск).
 ***
-```telegram_photo_publisher.py```
+### telegram_photo_publisher.py
 
 Скрипт для публикации всех фотографий из указанной папки в Telegram-канал с заданной задержкой между публикациями.
 
-Пример использования:
-
 ```bash
-python telegram_photo_publisher.py --chat_id <your_chat_id> --directory <folder_name> --delay 14400
+python telegram_photo_publisher.py --chat_id <your_chat_id> --directory <folder_name> --delay 12345
 ```
-Аргументы:
-
-`--chat_id`: ID или username Telegram-канала.
-
-`--directory`: путь к папке с фотографиями.
-
-`--delay`: задержка между публикациями в секундах (по умолчанию 14400 секунд, или 4 часа).
+В приведённом выше примере: `<your_chat_id>` - ID или username Telegram-канала, `<folder_name>` - путь к папке с фотографиями, `12345` - задержка между публикациями в секундах (по умолчанию 14400 секунд, или 4 часа).
 ***
-`telegram_single_photo_publisher.py`
-Скрипт для публикации одной фотографии в Telegram-канал. Если не указано имя фотографии, будет выбрана случайная.
+### telegram_single_photo_publisher.py
 
-Пример использования:
+Скрипт для публикации одной фотографии в Telegram-канал. Если не указано имя фотографии, будет выбрана случайная.
 
 ```bash
 python telegram_single_photo_publisher.py --chat_id <your_chat_id> --directory <folder_name> --photo_name <photo_name>
 ```
-Аргументы:
-
-`--chat_id`: ID или username Telegram-канала.
-`--directory`: путь к папке с фотографиями.
-`--photo_name`: имя фотографии для публикации (если не указано, выберется случайная).
+В приведённом выше примере: `<your_chat_id>` - ID или username Telegram-канала,`<folder_name>` - путь к папке с фотографиями, `<photo_name>` - имя фотографии для публикации (если не указано, выберется случайная).
 ***
-#### Вспомогательные скрипты:
+### Вспомогательные скрипты:
 
 `create_folder(folder_name)` - функция для создания папки, если она не существует.
 
@@ -125,6 +95,6 @@ python telegram_single_photo_publisher.py --chat_id <your_chat_id> --directory <
 
 `get_all_files(directory)` - функция для получения всех файлов из указанной директории.
 ***
-### Цель проекта
+## Цель проекта
 
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков [dvmn.org](https://dvmn.org/).
