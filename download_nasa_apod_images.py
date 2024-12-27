@@ -3,12 +3,12 @@ import os
 import requests
 from environs import Env
 
-from main import get_file_extension
+from utils import get_file_extension
+from utils import create_folder
 
 
 def download_nasa_apod_images(api_key, folder_name, count=30):
-    os.makedirs(folder_name, exist_ok=True)
-
+    create_folder(folder_name)
     url = 'https://api.nasa.gov/planetary/apod'
 
     try:
