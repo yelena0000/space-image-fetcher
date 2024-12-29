@@ -1,9 +1,8 @@
 import argparse
-import os
 import requests
 from environs import Env
 
-from utils import get_file_extension
+from utils import download_and_save_image
 from utils import create_folder
 
 
@@ -11,35 +10,18 @@ def download_nasa_apod_images(api_key, folder_name, count=30):
     create_folder(folder_name)
     url = 'https://api.nasa.gov/planetary/apod'
 
-    try:
-        params = {'api_key': api_key, 'count': count}
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        images_data = response.json()
+    params = {'api_key': api_key, 'count': count}
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    images_data = response.json()
 
-        for index, image_data in enumerate(images_data, start=1):
-            image_url = image_data.get('url')
+    for index, image_data in enumerate(images_data, start=1):
+        image_url = image_data.get('url')
 
-            if not image_url or image_data.get('media_type') != 'image':
-                continue
+        if not image_url or image_data.get('media_type') != 'image':
+            continue
 
-            try:
-                image_response = requests.get(image_url)
-                image_response.raise_for_status()
-
-                file_extension = get_file_extension(image_url)
-
-                filename = f'nasa_apod_{index}{file_extension}'
-                save_path = os.path.join(folder_name, filename)
-
-                with open(save_path, 'wb') as file:
-                    file.write(image_response.content)
-
-            except requests.exceptions.RequestException as e:
-                print(f'Ошибка при скачивании изображения {image_url}: {e}')
-
-    except requests.exceptions.RequestException as e:
-        print(f'Ошибка при запросе API NASA: {e}')
+        download_and_save_image('nasa_apod', image_url, folder_name, index)
 
 
 def main():
@@ -69,7 +51,6 @@ def main():
 
     env = Env()
     env.read_env()
-
     api_key = args.api_key or env.str('NASA_API_KEY', default=None)
 
     if not api_key:
@@ -77,7 +58,14 @@ def main():
               'или переменную окружения NASA_API_KEY.')
         return
 
-    download_nasa_apod_images(api_key, args.folder_name, args.count)
+    try:
+        download_nasa_apod_images(api_key, args.folder_name, args.count)
+    except requests.exceptions.RequestException as req_err:
+        print(f"Ошибка сети или API: {req_err}")
+    except OSError as file_err:
+        print(f"Ошибка при работе с файлами: {file_err}")
+    except Exception as unexpected_err:
+        print(f'Непредвиденная ошибка: {unexpected_err}')
 
 
 if __name__ == '__main__':
