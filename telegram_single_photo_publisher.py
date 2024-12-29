@@ -6,28 +6,27 @@ import telegram
 from environs import Env
 
 from utils import get_all_files
+from utils import send_photo_to_telegram
 
 
 def publish_photo(bot, chat_id, folder_name, photo_name=None):
     photos = get_all_files(folder_name)
 
     if not photos:
-        print('Нет доступных фото для публикации.')
-        return
+        raise ValueError(
+            'Нет доступных фото для публикации в указанной директории.'
+        )
 
     if photo_name:
         photo_path = os.path.join(folder_name, photo_name)
         if photo_path not in photos:
-            print(f'Фото {photo_name} не найдено в указанной директории.')
-            return
+            raise FileNotFoundError(
+                f'Фото {photo_name} не найдено в указанной директории.'
+            )
     else:
         photo_path = random.choice(photos)
 
-    try:
-        with open(photo_path, 'rb') as file:
-            bot.send_photo(chat_id=chat_id, photo=file)
-    except Exception as e:
-        print(f"Ошибка при публикации {photo_path}: {e}")
+    send_photo_to_telegram(bot, chat_id, photo_path)
 
 
 def main():
@@ -40,11 +39,13 @@ def main():
     parser.add_argument(
         '--chat_id',
         type=str,
+        required=True,
         help='ID или username Telegram-канала (например, @my_channel).'
     )
     parser.add_argument(
         '--directory',
         type=str,
+        required=True,
         help='Путь к директории с фотографиями.'
     )
     parser.add_argument(
@@ -56,10 +57,20 @@ def main():
 
     args = parser.parse_args()
 
-    token = env.str('TG_BOT_TOKEN')
-    bot = telegram.Bot(token=token)
+    try:
+        token = env.str('TG_BOT_TOKEN')
+        bot = telegram.Bot(token=token)
 
-    publish_photo(bot, args.chat_id, args.directory, args.photo_name)
+        publish_photo(bot, args.chat_id, args.directory, args.photo_name)
+
+    except ValueError as e:
+        print(f'Ошибка: {e}')
+    except FileNotFoundError as e:
+        print(f'Ошибка: {e}')
+    except telegram.error.TelegramError as e:
+        print(f'Ошибка при работе с Telegram API: {e}')
+    except Exception as e:
+        print(f'Неожиданная ошибка: {e}')
 
 
 if __name__ == '__main__':
