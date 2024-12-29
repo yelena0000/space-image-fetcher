@@ -6,29 +6,32 @@ import telegram
 from environs import Env
 
 from utils import get_all_files
+from utils import send_photo_to_telegram
 
 
 def publish_photos(bot, chat_id, folder_name, delay):
-    photos = get_all_files(folder_name)
+    try:
+        photos = get_all_files(folder_name)
+    except OSError as os_err:
+        raise RuntimeError(f"Ошибка при чтении директории "
+                           f"{folder_name}: {os_err}")
+
+    if not photos:
+        raise ValueError('Нет доступных фото для публикации. '
+                         'Добавьте файлы в указанную директорию.')
+
+    published_photos = []
 
     while True:
-        if not photos:
-            print('Нет доступных фото для публикации.'
-                  'Ожидание новых файлов...')
-            time.sleep(delay)
-            photos = get_all_files(folder_name)
-            continue
-
-        published_photos = []
-
         for photo in photos:
             try:
-                with open(photo, 'rb') as file:
-                    bot.send_photo(chat_id=chat_id, photo=file)
+                send_photo_to_telegram(bot, chat_id, photo)
                 published_photos.append(photo)
-            except Exception as e:
-                print(f'Ошибка при публикации {photo}: {e}')
-
+            except telegram.error.TelegramError as tg_err:
+                print(f'Ошибка при отправке фото {photo}: {tg_err}')
+            except Exception as unexpected_err:
+                print(f'Непредвиденная ошибка при отправке фото '
+                      f'{photo}: {unexpected_err}')
             time.sleep(delay)
 
         photos = published_photos.copy()
@@ -67,15 +70,25 @@ def main():
 
     if not args.chat_id:
         print(
-            'Не указан chat_id.'
+            'Не указан chat_id. '
             'Укажите его через --chat_id или переменную окружения TG_CHAT_ID.'
         )
         return
 
-    token = env.str('TG_BOT_TOKEN')
-    bot = telegram.Bot(token=token)
+    try:
+        token = env.str('TG_BOT_TOKEN')
+        bot = telegram.Bot(token=token)
 
-    publish_photos(bot, args.chat_id, args.directory, args.delay)
+        publish_photos(bot, args.chat_id, args.directory, args.delay)
+
+    except ValueError as val_err:
+        print(f'Ошибка: {val_err}')
+    except RuntimeError as runtime_err:
+        print(f'Ошибка работы с файловой системой: {runtime_err}')
+    except telegram.error.TelegramError as tg_err:
+        print(f'Ошибка Telegram API: {tg_err}')
+    except Exception as unexpected_err:
+        print(f'Неожиданная ошибка: {unexpected_err}')
 
 
 if __name__ == '__main__':
