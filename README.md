@@ -94,6 +94,14 @@ python telegram_single_photo_publisher.py --chat_id <your_chat_id> --directory <
 `get_file_extension(url)` - функция для получения расширения файла по URL.
 
 `get_all_files(directory)` - функция для получения всех файлов из указанной директории.
+
+`download_and_save_image(image_name, image_url, folder_name, index)` -функция для скачивания изображения
+из указанного URL и сохранения его в указанной папке.
+
+`send_photo_to_telegram(bot, chat_id, photo_path)` - функция для отправки изображения в Telegram-канал или чат.
+
+`fetch_spacex_launch_data(launch_id=None)` - функция для получения данных о запуске SpaceX по указанному ID 
+или о последнем запуске, если ID не задан.
 ***
 ## Цель проекта
 
