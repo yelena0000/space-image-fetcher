@@ -1,5 +1,6 @@
 import argparse
 import requests
+from datetime import datetime
 from environs import Env
 
 from utils import create_folder
@@ -20,8 +21,11 @@ def download_nasa_epic_images(api_key, folder_name, count=10):
         image_name = image_data['image']
         image_date = image_data['date']
 
-        date_only = image_date.split(' ')[0]
-        year, month, day = date_only.split('-')
+        parsed_date = datetime.fromisoformat(image_date)
+
+        year = parsed_date.strftime('%Y')
+        month = parsed_date.strftime('%m')
+        day = parsed_date.strftime('%d')
 
         params = {'api_key': api_key}
         image_url = (
@@ -46,9 +50,10 @@ def main():
         default=None
     )
     parser.add_argument(
-        'folder_name',
+        '--folder_name',
         type=str,
-        help='Имя папки, куда будут сохранены изображения.'
+        default='images',
+        help='Имя папки, куда будут сохранены изображения (по умолчанию "images").'
     )
     parser.add_argument(
         '--count',
