@@ -45,8 +45,8 @@ def main():
     parser.add_argument(
         '--directory',
         type=str,
-        required=True,
-        help='Путь к директории с фотографиями.'
+        default='images',
+        help='Путь к директории с фотографиями (по умолчанию "images").'
     )
     parser.add_argument(
         '--photo_name',
