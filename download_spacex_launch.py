@@ -6,20 +6,20 @@ from utils import download_and_save_image
 from utils import fetch_spacex_launch_data
 
 
-def fetch_spacex_launch(launch_id, folder_name):
+def download_spacex_launch(launch_id, folder_name):
     create_folder(folder_name)
 
-    photos_url = (
+    photo_urls = (
         fetch_spacex_launch_data(launch_id)
         .get('links', {})
         .get('flickr', {})
         .get('original', [])
     )
 
-    if not photos_url:
+    if not photo_urls:
         raise ValueError(f'Фотографий для запуска {launch_id} нет.')
 
-    for index, photo_url in enumerate(photos_url, start=1):
+    for index, photo_url in enumerate(photo_urls, start=1):
         download_and_save_image('spacex', photo_url, folder_name, index)
 
 
@@ -34,9 +34,10 @@ def main():
     )
 
     parser.add_argument(
-        'folder_name',
+        '--folder_name',
         type=str,
-        help='Имя папки, куда будут сохранены фотографии.'
+        default='images',
+        help='Имя папки, куда будут сохранены фотографии (по умолчанию "images").'
     )
 
     parser.add_argument(
@@ -53,7 +54,7 @@ def main():
         if args.launch_id is None:
             args.launch_id = get_latest_spacex_launch_id()
 
-        fetch_spacex_launch(args.launch_id, args.folder_name)
+        download_spacex_launch(args.launch_id, args.folder_name)
     except requests.exceptions.RequestException as req_err:
         print(f'Ошибка сети или запроса к API: {req_err}')
     except ValueError as value_err:
