@@ -36,9 +36,10 @@ def main():
         default=None
     )
     parser.add_argument(
-        'folder_name',
+        '--folder_name',
         type=str,
-        help='Имя папки, куда будут сохранены изображения.'
+        default='images',
+        help='Имя папки, куда будут сохранены изображения (по умолчанию "images").'
     )
     parser.add_argument(
         '--count',
